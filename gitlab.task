@@ -1,0 +1,19 @@
+apt update
+apt upgrade -y
+apt install -y curl openssh-server ca-certificates postfix
+wget https://image.sudoix.ir/gitlab-ce_16.2.3-ce.0_amd64.deb
+# gitlab-ce_16.2.3-ce.0_amd64.deb #####
+dpkg -i gitlab-ce_16.2.3-ce.0_amd64.deb
+vim /etc/gitlab/gitlab.rb
+# external_url http://'gitlab.amirmahdifarzam.ir'
+gitlab-ctl reconfigure
+ip -br a
+vim /etc/hosts 
+#IP ADDRESS OF SERVER   DOMAIN NAME
+#example : 192.168.142.128   http://gitlab.amirmahdifarzam.ir
+https://192.168.142.128
+Username: root
+Password: [the password listed on /etc/gitlab/initial_root_password]
+# reset password
+
+
