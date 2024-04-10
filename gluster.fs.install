@@ -1,0 +1,59 @@
+# add hard disk
+# create *lvm* and mount new disk
+pvcreate /dev/sdb
+vgcreate lvmsrv1 /dev/sdb
+lvcreate -l 100%FREE -n srv3 lvmsrv1
+mkfs.xfs /dev/lvmsrv1/srv1
+mkdir /data
+blkid /dev/lvmsrv1/srv1
+mount /dev/lvmsrv3/srv3 /mnt/srv3/
+reboot
+
+#install glusterfs
+apt-get update -y
+apt-get upgrade -y
+# Add Ip Addresses and Host names of your 3 nodes in /etc/hosts
+vim /etc/hosts
+192.168.142.108 srv1
+192.168.142.128 srv2
+192.168.142.138 srv3
+apt-get update
+apt-get install -y software-properties-common
+add-apt-repository ppa:gluster/glusterfs-9
+apt-get update
+apt-get install glusterfs-server -y
+apt-get install glusterfs-client -y
+systemctl start glusterd.service
+systemctl enable glusterd.service
+systemctl status glusterd.service
+glusterfsd --version
+
+gluster peer probe srv2
+gluster peer probe srv3
+gluster peer status
+gluster pool list
+
+# create a brick directory
+mkdir /glustervolume/fs1
+gluster volume create vol1 replica 3 srv1:/glustervolume/fs1 srv2:/glustervolume/fs1 srv3:/glustervolume/fs1
+gluster volume start vol1
+gluster volume status
+mkdir /mnt/vol1
+mount -t glusterfs srv1:/fs1 /mnt/vol1
+mount -t glusterfs srv2:/fs1 /mnt/vol1
+mount -t glusterfs srv3:/fs1 /mnt/vol1
+
+# Make a file in one of the servers and check other to see the file
+touch /mnt/vol1/file1.txt
+vim /mnt/vol1/file1.txt
+#	bye bye
+
+
+
+
+
+
+
+
+
+
