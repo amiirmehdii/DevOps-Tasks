@@ -1,0 +1,36 @@
+# Created 3 Node:
+192.168.142.108 srv
+192.168.142.128 clone-1
+192.168.142.138 clone-2
+apt update
+apt-get upgrade
+apt install -y chrony
+vim /etc/chrony/chrony.conf
+# replace
+	pool 0.id.pool.ntp.org iburst maxsources 4
+	pool 1.id.pool.ntp.org iburst maxsources 1
+	pool 2.id.pool.ntp.org iburst maxsources 1
+	pool 3.id.pool.ntp.org iburst maxsources 2
+systemctl restart chrony
+systemctl enable chrony
+systemctl status chrony
+wget https://image.sudoix.ir/cockroach/cockroach-v23.2.2.linux-amd64.tgz
+tar -xvzf cockroach-v23.2.2.linux-amd64.tgz
+cp cockroach-*/cockroach /usr/local/bin/
+mkdir ~/certs
+cockroach cert create-ca --certs-dir=certs --ca-key=certs/ca.key
+# CP the Generated CA Certificate 2 Others
+cockroach start --background --certs-dir=certs --advertise-host=192.168.142.108 --join=192.168.142.108,192.168.142.128,192.168.142.138
+cockroach init --certs-dir=certs --host=192.168.142.108
+cockroach node status --certs-dir=certs --host=192.168.142.108
+# clone-1:
+cockroach start --background --certs-dir=certs --advertise-host=192.168.142.128 --listen-addr=192.168.142.128 --join=192.168.142.108:26257
+# clone-2:
+cockroach start --background --certs-dir=certs --advertise-host=192.168.142.138 --listen-addr=192.168.142.138 --join=192.168.142.108:26257
+# Back 2 srv:
+cockroach node status --certs-dir=certs --host=192.168.142.108
+
+
+
+
+
