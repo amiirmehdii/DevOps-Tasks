@@ -1,0 +1,42 @@
+# Display Existing Logical Volumes :
+lvs
+# Size of Your Logical Volume :
+df -h
+# Add 2 Hard Disks :
+lsblk
+# Create Partition :
+fdisk /dev/sdb
+fdisk /dev/sdc
+pvcreate /dev/sdb1
+pvcreate /dev/sdc1
+pvdisplay
+pvs
+vgcreate clone_vg /dev/sdb1
+vgcreate clone_vg /dev/sdc1
+vgdisplay
+vgs
+# lvcreate -s -n <snapshot_name> -L <size> <logical_volume> :
+lvcreate -L 400 -n vol1 clone_vg 
+lvcreate -L 600 -n vol2 clone_vg
+lvdisplay
+lvs
+mkfs.ext4 -m 0 /dev/clone_vg/vol1
+mkdir -p /mnt/volume1
+mount /dev/clone_vg/vol1 /mnt/volume1
+# cp Something on /mnt/volume1 :
+# The Snapshot Size Should be Larger than the Used Size of Your Lv , So Volume of Snapshot is 50M & Creating LVM Snapshots Using Lvcreate :
+lvcreate -s -L 50M -n volume1_snapshot /dev/clone_vg/vol1
+# rm * we cp on /mnt/volume1 :
+rm -rf /mnt/volume1/*
+# Recover :
+lvconvert --merge /dev/clone_vg/volume1_snapshot
+lvchange --refresh /clone_vg/vol1
+# Umount the Volume Trying to be Recover :
+umount /mnt/volume1
+# Active :
+lvchange -a n /dev/clone_vg/vol1
+lvchange -a y /dev/clone_vg/vol1
+# Mount Again :
+mount /dev/clone_vg/vol1 /mnt/volume1
+
+
