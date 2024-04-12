@@ -1,0 +1,34 @@
+apt-get update
+apt-get install ifenslave
+modprobe bonding
+vim /etc/netplan/*.yaml
+'	'	'	network:
+			  version: 2
+			  ethernets:
+			    ens33:
+			      dhcp4: false
+			    ens37:
+			      dhcp4: false
+			  bonds:
+			    bond0:
+			      dhcp4: false
+			      interfaces:
+			        - ens33
+			        - ens37
+			      addresses:
+			        - 192.168.142.138/24
+			      parameters:
+			        mode: active-backup
+			        primary: ens33
+			        mii-monitor-interval: 100
+netplan try
+netplan apply
+
+
+
+
+
+
+
+
+
