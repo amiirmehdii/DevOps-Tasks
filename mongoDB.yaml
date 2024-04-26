@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update package lists
+      apt: update_cache=yes
+
+    - name: Install MongoDB package
+      apt:
+        name: mongodb
+        state: present
+
+    - name: Enable and start MongoDB service
+      service:
+        name: mongodb
+        state: started
+        enabled: yes
+

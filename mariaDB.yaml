@@ -1,0 +1,20 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update package lists
+      apt: update_cache=yes
+
+    - name: Install MariaDB packages
+      apt:
+        name:
+          - mariadb-server
+          - mariadb-client
+        state: present
+
+    - name: Enable and start MariaDB service
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
