@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  redis1:
+    image: redis:latest
+    container_name: redis1
+    hostname: redis1
+    volumes:
+      - ./redis1/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - redis-net
+
+  redis2:
+    image: redis:latest
+    container_name: redis2
+    hostname: redis2
+    volumes:
+      - ./redis2/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - redis-net
+
+  redis3:
+    image: redis:latest
+    container_name: redis3
+    hostname: redis3
+    volumes:
+      - ./redis3/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - redis-net
+
+# Sentinel is a Redis based high availability solution that runs on Ubuntu.
+# It monitors the Redis instances and automatically performs failover when a master node goes down.
+
+  sentinel1:
+    image: redis:latest
+    container_name: sentinel1
+    hostname: sentinel1
+    volumes:
+      - ./sentinel/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      - redis-net
+
+  sentinel2:
+    image: redis:latest
+    container_name: sentinel2
+    hostname: sentinel2
+    volumes:
+      - ./sentinel/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      - redis-net
+
+  sentinel3:
+    image: redis:latest
+    container_name: sentinel3
+    hostname: sentinel3
+    volumes:
+      - ./sentinel/sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
+    depends_on:
+      - redis1
+      - redis2
+      - redis3
+    networks:
+      - redis-net
+
+networks:
+  redis-net:
+    driver: bridge
